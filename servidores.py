@@ -15,7 +15,7 @@ from config import Config
 subprocess.Popen("clear")
 from pyfiglet import Figlet
 # http://www.figlet.org/examples.html
-print(Figlet("eftifont").renderText('SWITCHES'))
+print(Figlet("eftifont").renderText('SERVIDORES'))
 
 ########## estilo + opções #########
 style = style_from_dict({
@@ -29,7 +29,7 @@ style = style_from_dict({
 })
 
 # retorna um namedtuple de todos dispositivos
-hosts = Config.get_dispositivos(opcao='SW' ,todas=True)
+hosts = Config.get_dispositivos(opcao='SRV' ,todas=True)
 
 hostname_choices = list()
 for host in hosts:
@@ -39,35 +39,36 @@ hostname_choices.append({'name': 'voltar'})
 while True:
     opcoes = [{
         'type': 'list',
-        'message': 'Selecione o switch desejado:',
-        'name': 'switches',
-        'choices': hostname_choices
-    }]
+        'message': 'Selecione o servidor desejada:',
+        'name': 'servidores',
+        'choices': hostname_choices}]
 
-    resposta = prompt(opcoes, style=style) # dicionário no formato {'switches': 'nome-do-switch'}
-    switch = ''.join((switch for switch in resposta.values())) # extrai o valor 'nome-do-switch' do dicionário "resposta"
+    resposta = prompt(opcoes, style=style) # dicionário no formato {'olts': 'nome-da-olt'}
+    servidor = ''.join((servidor for servidor in resposta.values())) # extrai o valor 'nome-da-olt' do dicionário "resposta"
 
-    if switch == 'voltar':
+    if servidor == 'voltar':
         subprocess.Popen("clear")
         break
-    
-    destino = hosts.get(switch) # extrai o ip do dicionário "addresses" dado o valor selecionado.
 
-    ######## logs ########
+    destino = hosts.get(servidor) # extrai o ip do dicionário "addresses" dado o valor selecionado.
+
+    ######## logs ########  
     script_dir    = os.path.dirname(__file__)
-    relativo_dir  = datetime.now().strftime('logs/SWs/' + switch + '-%Y_%m_%d-%H_%M_%S.log')
+    relativo_dir  = datetime.now().strftime('logs/SRVs/' + servidor + '-%Y_%m_%d-%H_%M_%S.log')
     abs_file_path = os.path.join(script_dir, relativo_dir)
     logs = open(abs_file_path, 'wb')
 
     ####### acesso ######
-    PROMPT = ["#", ">", ":"]
-    if destino.protocolo == 'ssh':
+    PROMPT = ["#", ">", ":", "$"]
+    if destino.protocolo == 'chave' or destino.protocolo == 'ssh':
         connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
         connect.logfile_read = logs
         connect.expect(PROMPT)
-        connect.sendline(destino.senha)
-        connect.expect(PROMPT)
-        connect.sendline("\r")
+        if destino.protocolo == 'ssh':
+            print("aqui")
+            connect.sendline(destino.senha)
+            connect.expect(PROMPT)
+            connect.sendline("\r")
     else: # telnet
         connect = pexpect.spawn(f'telnet {destino.ip} {destino.porta}')
         connect.logfile_read = logs # linka processo "filho" do pexpect.spawn  ao arquivo log
@@ -78,5 +79,5 @@ while True:
         connect.sendline("\r")
 
     connect.interact()
-    print('Desconectado do switch. Selecione "voltar" para retornar ao menu anterior')
+    print('Desconectado da OLT. Caso deseje sair do menu, selecione "sair"')
     logs.close()

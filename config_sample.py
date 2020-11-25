@@ -12,57 +12,60 @@ from collections import namedtuple
 
 class Config:
     __OLT = namedtuple('OLT', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
-
-    # Dispositivo    nome              usuario       senha                  ip       protocolo porta
-    __OLTs =       {'OLT1':     __OLT('usuario',    'senha@segura',    '10.0.10.20',   'ssh',  22),
-                    'OLT2':     __OLT('usuario',    'senha@segura',    '10.0.10.30',   'ssh',  22),
-                    'OLT3':     __OLT('usuario',    'senha@segura',    '10.0.10.40',   'ssh',  22)}
-    
     __SW = namedtuple('Switch', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
-    # Dispositivo    nome             usuario        senha                  ip       protocolo porta
-    __SWs =        {'SW1':      __SW('usuario',     'senha@segura',     '10.0.0.20',    'ssh',  22),
-                    'SW2':      __SW('usuario',     'senha@segura',     '10.0.0.30',    'ssh',  22),
-                    'SW3':      __SW('usuario',     'senha@segura',     '10.0.0.40',    'ssh',  22)}
-
     __SRV = namedtuple('Servidor', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
-    # Dispositivo    nome             usuario        senha                  ip       protocolo porta
-    __SRVs =       {'server1':  __SRV('root',       'senha@segura',     '10.0.20.20',  'ssh',   22),
-                    'server2':  __SRV('usuario',    'senha@segura',     '10.0.20.30',  'chave', 22),
-                    'server3':  __SRV('root',       'senha@segura',     '10.0.20.40',  'chave', 22)}
+
+    __categorias = {
+        # Dispositivo nome           usuario      senha            ip       protocolo porta
+        'OLTs':     {'OLT1':   __OLT('usuario',  'senha@dificil',  '10.0.10.2',   'ssh',  22),
+                    'OLT2':    __OLT('usuario',  'senha#segura',   '10.0.10.6',   'ssh',  22),
+                    'OLT3':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22)},
+
+        # Dispositivo    nome                usuario      senha            ip        protocolo porta
+        'SWs':      {'PE1 (s6720)':     __SW('lucas',   'senha@dificil', '10.0.20.2',   'ssh',  22),
+                    'PPPoE Srv (NE20)': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
+                    'BGP (NE40)':       __SW('admin',   'senha_unica',   '10.0.20.10',  'ssh',  22)},
+
+        # Dispositivo    nome                  usuario        senha             ip       protocolo porta
+        'SRVs':     {'MKSolutions':      __SRV('root',     'senha@dificil',  '10.0.30.2',  'ssh',   22),
+                    'DNS Autoritativo 1':__SRV('usuario',  'senha#segura',   '10.0.30.6',  'chave', 22),
+                    'Flask Projects':    __SRV('lucas',    'senha_unica',    '10.0.30.10', 'chave', 22)}
                     # obs: protocolo chave = ssh key, acesso sem senha
+    }
 
     @staticmethod
     def get_olt(disp=None, todas=False):
-        if todas:
-            return Config.__OLTs
-        elif disp == None:
+        if disp == None and todas == False:
             print("Por favor, selecione um dispositivo.")
             exit()
-        else:
-            return Config.__OLTs[disp]
-    
+        elif disp:
+            return Config.categorias['OLTs'][disp]
+        else: # todas = True
+            return Config.categorias['OLTs']
+
     @staticmethod
     def get_sw(disp=None, todas=False):
-        if todas:
-            return Config.__SWs
-        elif disp == None:
+        if disp == None and todas == False:
             print("Por favor, selecione um dispositivo.")
             exit()
-        else:
-            return Config.__SWs[disp]
-    
+        elif disp:
+            return Config.categorias['SWs'][disp]
+        else: # todas = True
+            return Config.categorias['SWs']
+
     @staticmethod
-    def get_srv(disp=None, Todas=False):
-        if todas:
-            return Config.__SRVs
-        elif disp == None:
+    def get_srv(disp=None, todas=False):
+        if disp == None and todas == False:
             print("Por favor, selecione um dispositivo.")
             exit()
-        else:
-            return Config.__SRVs[disp]
+        elif disp:
+            return Config.categorias['SRVs'][disp]
+        else: # todas = True
+            return Config.categorias['SRVs']
 
 #from config import Config
-#print(Config.get_olt("OLT1"))
 #print(Config.get_olt(todas=True))
-#print(Config.get_olt())
+#print(Config.get_olt(disp='Bela Roma'))
+#print(Config.get_olt()) # dá erro e sai do script
+
 

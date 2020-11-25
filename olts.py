@@ -5,26 +5,17 @@ import os
 import pathlib
 import pexpect
 import subprocess
-from configparser import ConfigParser
 from datetime import datetime
 from PyInquirer import style_from_dict, Token, prompt, Separator
+from config import Config
 
 # TODO:
 # - Nome do usuário no log
-# - Change lists to tuples
-# (same syntax, faster for fixed size)
 
-creds_config = ConfigParser()
-creds_config.read(str(pathlib.Path(__file__).parent.absolute()) + '/secrets.ini')
-creds = creds_config['OLTS']
-
-olts_config = ConfigParser()
-olts_config.read(str(pathlib.Path(__file__).parent.absolute()) + '/config.ini')
-olts = olts_config['OLTS']
-
-hosts = {}
-for olt in olts:
-    hosts[olt] = olts[olt]
+subprocess.Popen("clear")
+from pyfiglet import Figlet
+# http://www.figlet.org/examples.html
+print(Figlet("eftifont").renderText('OLTS'))
 
 ########## estilo + opções #########
 style = style_from_dict({
@@ -37,14 +28,11 @@ style = style_from_dict({
     Token.Question: '',
 })
 
-subprocess.Popen("clear")
-from pyfiglet import Figlet
-# http://www.figlet.org/examples.html
-print(Figlet("eftifont").renderText('OLTS'))
+# retorna um namedtuple de todos dispositivos
+hosts = Config.get_dispositivos(opcao='OLT' ,todas=True)
 
-hostnames = tuple(olts)
-hostname_choices = []
-for host in hostnames:
+hostname_choices = list()
+for host in hosts:
     hostname_choices.append({'name': host})
 hostname_choices.append({'name': 'voltar'})
 
@@ -57,11 +45,12 @@ while True:
 
     resposta = prompt(opcoes, style=style) # dicionário no formato {'olts': 'nome-da-olt'}
     olt = ''.join((olt for olt in resposta.values())) # extrai o valor 'nome-da-olt' do dicionário "resposta"
-    destino = hosts.get(olt) # extrai o ip do dicionário "addresses" dado o valor selecionado.
 
     if olt == 'voltar':
         subprocess.Popen("clear")
         break
+
+    destino = hosts.get(olt) # extrai o ip do dicionário "addresses" dado o valor selecionado.
 
     ######## logs ########  
     script_dir    = os.path.dirname(__file__)
@@ -70,15 +59,32 @@ while True:
     logs = open(abs_file_path, 'wb')
 
     ####### acesso ######
-    connect = pexpect.spawn(f'telnet {destino}')
-    connect.logfile_read = logs # linka processo "filho" do pexpect.spawn  ao arquivo log
-    connect.expect(":")
-    connect.sendline(creds['user'])
-    connect.expect(":")
-    connect.sendline(creds['passw'])
-    connect.expect(">")
-    connect.sendline("enable")
-    connect.sendline("config")
+    PROMPT = ["#", ">", ":"]
+    if destino.protocolo == 'ssh':
+        connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
+        connect.logfile_read = logs
+        connect.expect(PROMPT)
+        connect.sendline(destino.senha)
+        connect.expect(PROMPT)
+        if destino.fabricante == 'huawei':
+            connect.sendline("enable")
+            connect.expect(PROMPT)
+            connect.sendline("config")
+            connect.expect(PROMPT)
+            connect.sendline("\r")
+    else: # telnet
+        connect = pexpect.spawn(f'telnet {destino.ip} {destino.porta}')
+        connect.logfile_read = logs # linka processo "filho" do pexpect.spawn  ao arquivo log
+        connect.expect(PROMPT)
+        connect.sendline(destino.usuario)
+        connect.expect(PROMPT)
+        connect.sendline(destino.senha)
+        if destino.fabricante == 'huawei':
+            connect.sendline("enable")
+            connect.expect(PROMPT)
+            connect.sendline("config")
+            connect.expect(PROMPT)
+            connect.sendline("\r")
 
     connect.interact()
     print('Desconectado da OLT. Caso deseje sair do menu, selecione "sair"')
