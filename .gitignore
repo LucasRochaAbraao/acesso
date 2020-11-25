@@ -1,0 +1,10 @@
+config.ini
+secrets.ini
+config.py
+logs/CEs/*
+logs/OLTs/*
+logs/SWs/*
+!logs/CEs/.gitkeep
+!logs/OLTs/.gitkeep
+!logs/SWs/.gitkeep
+__pycache__/
