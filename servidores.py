@@ -29,11 +29,9 @@ style = style_from_dict({
 })
 
 # retorna um namedtuple de todos dispositivos
-hosts = Config.get_dispositivos(opcao='SRV' ,todas=True)
+hosts = Config.get_dispositivos(opcao='SRV')
 
-hostname_choices = list()
-for host in hosts:
-    hostname_choices.append({'name': host})
+hostname_choices = [{'name': host} for host in hosts]
 hostname_choices.append({'name': 'voltar'})
 
 while True:
@@ -65,7 +63,7 @@ while True:
         connect.logfile_read = logs
         connect.expect(PROMPT)
         if destino.protocolo == 'ssh':
-            print("aqui")
+            connect.expect(PROMPT)
             connect.sendline(destino.senha)
             connect.expect(PROMPT)
             connect.sendline("\r")

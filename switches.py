@@ -29,11 +29,9 @@ style = style_from_dict({
 })
 
 # retorna um namedtuple de todos dispositivos
-hosts = Config.get_dispositivos(opcao='SW' ,todas=True)
+hosts = Config.get_dispositivos(opcao='SW')
 
-hostname_choices = list()
-for host in hosts:
-    hostname_choices.append({'name': host})
+hostname_choices = [{'name': host} for host in hosts]
 hostname_choices.append({'name': 'voltar'})
 
 while True:

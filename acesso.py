@@ -61,7 +61,7 @@ while True:
         'name': 'olts',
         'choices': [{'name': 'OLTs'},
                     {'name': 'Switches'},
-                    {'name': 'CEs'},
+                    {'name': 'Servidores'},
                     {'name': 'sair'}]
 }]
 
@@ -74,7 +74,7 @@ while True:
     if valor == 'sair':
         print('Volte sempre!')
         time.sleep(0.5)
-        subprocess.Popen("clear")
+        #subprocess.Popen("clear")
         sys.exit()
 
     ######## rodar scripts selecionados ########
@@ -86,8 +86,8 @@ while True:
         destino = os.path.dirname(base_file) + '/olts.py'
     elif valor == 'Switches':
         destino = os.path.dirname(base_file) + '/switches.py'
-    elif valor == 'CEs':
-        destino = os.path.dirname(base_file) + '/concentradores.py'
+    elif valor == 'Servidores':
+        destino = os.path.dirname(base_file) + '/servidores.py'
 
 
     subprocess.call(["python3", destino])
