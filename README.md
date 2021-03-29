@@ -1,8 +1,8 @@
 # ACESSO
-This tool allows me to access all cli hosts in my network, by categories.
 
 ![exemplo](gif/acesso.gif)
 
+This tool allows me to access all cli hosts in my network, by categories.
 Steps to use it:
 
 - Clone the repo.
