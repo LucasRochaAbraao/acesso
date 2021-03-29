@@ -17,17 +17,19 @@ class Config:
 
     __categorias = {
         # Dispositivo nome           usuario      senha            ip       protocolo porta
-        'OLTs':     {'OLT1':   __OLT('usuario',  'senha@dificil',  '10.0.10.2',   'ssh',  22),
-                    'OLT2':    __OLT('usuario',  'senha#segura',   '10.0.10.6',   'ssh',  22),
-                    'OLT3':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22)},
+        'OLTs':     {'OLT 1':   __OLT('usuario',  'senha@dificil',  '10.0.10.2',   'ssh',  22),
+                    'OLT 2':    __OLT('usuario',  'senha#segura',   '10.0.10.6',   'ssh',  22),
+                    'OLT 3':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22),
+                    'OLT N':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22)},
 
         # Dispositivo    nome                usuario      senha            ip        protocolo porta
-        'SWs':      {'PE1 (s6720)':     __SW('lucas',   'senha@dificil', '10.0.20.2',   'ssh',  22),
-                    'PPPoE Srv (NE20)': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
-                    'BGP (NE40)':       __SW('admin',   'senha_unica',   '10.0.20.10',  'ssh',  22)},
+        'SWs':      {'PE 1':     __SW('lucas',   'senha@dificil', '10.0.20.2',   'ssh',  22),
+                    'PE 2': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
+                    'PE N': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
+                    'BGP':       __SW('admin',   'senha_unica',   '10.0.20.10',  'ssh',  22)},
 
         # Dispositivo    nome                  usuario        senha             ip       protocolo porta
-        'SRVs':     {'MKSolutions':      __SRV('root',     'senha@dificil',  '10.0.30.2',  'ssh',   22),
+        'SRVs':     {'Server 1':      __SRV('root',     'senha@dificil',  '10.0.30.2',  'ssh',   22),
                     'DNS Autoritativo 1':__SRV('usuario',  'senha#segura',   '10.0.30.6',  'chave', 22),
                     'Flask Projects':    __SRV('lucas',    'senha_unica',    '10.0.30.10', 'chave', 22)}
                     # obs: protocolo chave = ssh key, acesso sem senha
