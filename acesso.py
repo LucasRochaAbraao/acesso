@@ -26,8 +26,9 @@ Um dia vou refazer esse script usando o módulo curses...
 """
 
 # TODO
-# - criar um script para atualizar os arquivos .ini. Adicionar
-# hosts e usuário+senha.
+# - Eu tinha em mente colocar um menu para inclur e excluir hosts,
+# mas acho desnecessário, prefiro editar o arquivo config.py msm.
+# - Adicionar credenciais de acesso.
 # -
 
 
@@ -78,6 +79,14 @@ while True:
         sys.exit()
 
     ######## rodar scripts selecionados ########
+    # não é o ideal, mas hoje em dia não tenho muito tempo pra refatoriar....
+    
+    # A variável abaixo só funciona quando rodo o script de forma executável,
+    # através de um symlink. Eu faço isso pois crio um symlink para um diretório
+    # que faz parte do $PATH do linux. Caso queira rodar o script com o
+    # interpretador do Python (ex: python acesso.py e não ./acesso.py) então
+    # comente essa a variável "base_file" e no "destino" abaixo, coloque
+    # o diretório completo de cada script das categorias desejadas.
     base_file = os.readlink(os.path.abspath(__file__))
     # Preciso extrair um symlink aqui pq crio um para manter o código
     # no diretório com git, e o executável (softlink) em outro diretório (no $PATH)

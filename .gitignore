@@ -8,3 +8,5 @@ logs/SRVs/*
 !logs/SWs/.gitkeep
 !logs/SRVs/.gitkeep
 __pycache__/
+.venv/
+.vscode

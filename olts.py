@@ -11,6 +11,7 @@ from config import Config
 
 # TODO:
 # - Nome do usuário no log
+# - mudar arquivo todo pra uma classe, ou no mínimo uma func main().
 
 subprocess.Popen("clear")
 from pyfiglet import Figlet
