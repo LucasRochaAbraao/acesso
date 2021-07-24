@@ -7,67 +7,46 @@
 #           25/11/2020          #
 #################################
 
-
 from collections import namedtuple
 
+
 class Config:
-    __OLT = namedtuple('OLT', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
-    __SW = namedtuple('Switch', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
-    __SRV = namedtuple('Servidor', ['usuario', 'password', 'ip', 'protocolo', 'porta'])
+    __OLT = namedtuple('OLT', ['usuario', 'senha', 'ip', 'protocolo', 'porta', 'fabricante'])
+    __SW = namedtuple('Switch', ['usuario', 'senha', 'ip', 'protocolo', 'porta', 'fabricante'])
+    __SRV = namedtuple('Servidor', ['usuario', 'senha', 'ip', 'protocolo', 'porta', 'fabricante'])
+
 
     __categorias = {
-        # Dispositivo nome           usuario      senha            ip       protocolo porta
-        'OLTs':     {'OLT 1':   __OLT('usuario',  'senha@dificil',  '10.0.10.2',   'ssh',  22),
-                    'OLT 2':    __OLT('usuario',  'senha#segura',   '10.0.10.6',   'ssh',  22),
-                    'OLT 3':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22),
-                    'OLT N':    __OLT('usuario',  'senha_unica',    '10.0.10.10',  'ssh',  22)},
+        # Dispositivo      usuario          senha                ip       protocolo    porta  fabricante
+        'OLT': {
+            'OLT1': __OLT('usuario',    'senha@dificil',    '10.0.10.2',    'ssh',      22,     'huawei'),
+            'OLT2': __OLT('usuario',    'senha#segura',     '10.0.10.6',    'ssh',      2222,   'huawei'),
+            'OLT3': __OLT('usuario',    'senha_unica',      '10.0.10.10',   'telnet',   23,     'huawei'),
+            'OLT4': __OLT('usuario',    'senha_123',        '10.0.10.14',   'telnet',   23,     'huawei'),
+        },
+        
+        # Dispositivo      nome                   usuario      senha            ip           protocolo porta
+        'SW': {
+            'PE 1': __SW('lucas',   'Lucas93@huawei',   '10.0.99.1',    'ssh',  22, 'huawei'),
+            'PE 2': __SW('user',    'Lucas93@huawei',   '10.222.212.2', 'ssh',  22, 'huawei'),
+            'PE n': __SW('usuario', 'Lucas93@huawei',   '10.0.99.2',    'ssh',  22, 'huawei'),
+            'BGP':  __SW('admin',   'Lucas93@huawei',   '10.0.99.3',    'ssh',  22, 'huawei'),
+        },
 
-        # Dispositivo    nome                usuario      senha            ip        protocolo porta
-        'SWs':      {'PE 1':     __SW('lucas',   'senha@dificil', '10.0.20.2',   'ssh',  22),
-                    'PE 2': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
-                    'PE N': __SW('usuario', 'senha#segura',  '10.0.20.6',   'ssh',  22),
-                    'BGP':       __SW('admin',   'senha_unica',   '10.0.20.10',  'ssh',  22)},
-
-        # Dispositivo    nome                  usuario        senha             ip       protocolo porta
-        'SRVs':     {'Server 1':      __SRV('root',     'senha@dificil',  '10.0.30.2',  'ssh',   22),
-                    'DNS Autoritativo 1':__SRV('usuario',  'senha#segura',   '10.0.30.6',  'chave', 22),
-                    'Flask Projects':    __SRV('lucas',    'senha_unica',    '10.0.30.10', 'chave', 22)}
-                    # obs: protocolo chave = ssh key, acesso sem senha
+        # Dispositivo      nome                   usuario      senha            ip          protocolo porta
+        'SRV': {
+            'Server1':              __SRV('root',   'senha@DIFICIL',    '10.0.30.2',    'ssh',      22,     'linux'),
+            'DNS Autoritativo 1':   __SRV('admin',  'SENHA#segura',     '10.0.30.6',    'chave',    22,     'linux'),
+            'Flask Projects':       __SRV('lucas',  'alguma_senha',     '10.0.30.10',   'chave',    2217,   'linux'),
+        }   # obs: protocolo chave = ssh key, acesso sem senha
     }
 
     @staticmethod
-    def get_olt(disp=None, todas=False):
-        if disp == None and todas == False:
-            print("Por favor, selecione um dispositivo.")
-            exit()
-        elif disp:
-            return Config.categorias['OLTs'][disp]
-        else: # todas = True
-            return Config.categorias['OLTs']
-
-    @staticmethod
-    def get_sw(disp=None, todas=False):
-        if disp == None and todas == False:
-            print("Por favor, selecione um dispositivo.")
-            exit()
-        elif disp:
-            return Config.categorias['SWs'][disp]
-        else: # todas = True
-            return Config.categorias['SWs']
-
-    @staticmethod
-    def get_srv(disp=None, todas=False):
-        if disp == None and todas == False:
-            print("Por favor, selecione um dispositivo.")
-            exit()
-        elif disp:
-            return Config.categorias['SRVs'][disp]
-        else: # todas = True
-            return Config.categorias['SRVs']
+    def get_dispositivos(opcao=None, disp=False):
+        if disp:
+            return Config.__categorias[opcao][disp]
+        else:
+            return Config.__categorias[opcao]
 
 #from config import Config
-#print(Config.get_olt(todas=True))
-#print(Config.get_olt(disp='Bela Roma'))
-#print(Config.get_olt()) # dá erro e sai do script
-
-
+#print(Config.get_dispositivos(opcao='OLT'))
