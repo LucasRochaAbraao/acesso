@@ -38,6 +38,10 @@ import os
 import sys
 import time
 import subprocess
+import pathlib
+import pexpect
+from datetime import datetime
+from config import Config
 from pyfiglet import Figlet
 # http://www.figlet.org/examples.html
 print(Figlet("eftifont").renderText('MENU PRINCIPAL'))  # banner inicial
@@ -56,50 +60,98 @@ style = style_from_dict({
 })
 
 while True:
+    
+    categorias = list()
+    for categ in Config.get_categorias():
+        categorias.append({'name': categ})
+    categorias.append({'name': 'sair'})
+
     opcoes = [{
         'type': 'list',
         'message': 'Selecione a categoria desejada:',
-        'name': 'olts',
-        'choices': [{'name': 'OLTs'},
-                    {'name': 'Switches'},
-                    {'name': 'Servidores'},
-                    {'name': 'sair'}]
+        'name': 'menu',
+        'choices': categorias
 }]
 
-    # resposta é um dicionário no formato {'olts': 'nome-da-olt'}
+    # resposta é um dicionário no formato {'menu': 'categoria'}
     resposta = prompt(opcoes, style=style)
 
-    # extrai o valor 'nome-da-olt' do dicionário "resposta"
-    valor = ''.join(valor for valor in resposta.values())
+    # extrai o valor 'categoria' do dicionário "resposta"
+    categoria = ''.join(valor for valor in resposta.values())
 
-    if valor == 'sair':
+    if categoria == 'sair':
         print('Volte sempre!')
         time.sleep(0.5)
         #subprocess.Popen("clear")
         sys.exit()
-
-    ######## rodar scripts selecionados ########
-    # não é o ideal, mas hoje em dia não tenho muito tempo pra refatoriar....
     
-    # A variável abaixo só funciona quando rodo o script de forma executável,
-    # através de um symlink. Eu faço isso pois crio um symlink para um diretório
-    # que faz parte do $PATH do linux. Caso queira rodar o script com o
-    # interpretador do Python (ex: python acesso.py e não ./acesso.py) então
-    # comente essa a variável "base_file" e no "destino" abaixo, coloque
-    # o diretório completo de cada script das categorias desejadas.
-    base_file = os.readlink(os.path.abspath(__file__))
-    # Preciso extrair um symlink aqui pq crio um para manter o código
-    # no diretório com git, e o executável (softlink) em outro diretório (no $PATH)
+    
+    # retorna um namedtuple de todos dispositivos
+    hosts = Config.get_dispositivos(opcao=categoria)
 
-    if valor == 'OLTs':
-        destino = os.path.dirname(base_file) + '/olts.py'
-    elif valor == 'Switches':
-        destino = os.path.dirname(base_file) + '/switches.py'
-    elif valor == 'Servidores':
-        destino = os.path.dirname(base_file) + '/servidores.py'
+    hostname_choices = [{'name': host} for host in hosts]
+    hostname_choices.append({'name': 'voltar'})
+
+    while True:
+        opcoes = [{
+            'type': 'list',
+            'message': 'Selecione o dispositivo desejado:',
+            'name': 'dispositivos',
+            'choices': hostname_choices}]
+
+        resposta = prompt(opcoes, style=style) # dicionário no formato {'dispositivos': 'dispositivo'}
+        dispositivo = ''.join((disp for disp in resposta.values())) # extrai o valor 'dispositivo' do dicionário "resposta"
+
+        if dispositivo == 'voltar':
+            subprocess.Popen("clear")
+            break
+
+        destino = hosts.get(dispositivo) # extrai o namedtuple de um dispositivo do arquivo config.py
+        ######## logs ########  
+        script_dir    = os.path.dirname(__file__)
+        dispositivo_name = dispositivo.replace(' ', '_') # substitui espaço por underscore para o nome do log sem espaço
+        relativo_dir  = datetime.now().strftime(f'logs/{categoria}/{dispositivo_name}-%Y_%m_%d-%H_%M_%S.log')
+        abs_file_path = os.path.join(script_dir, relativo_dir)
+        logs = open(abs_file_path, 'wb')
+
+        ####### acesso ######
+        PROMPT = ["#", ">", ":"]
+        # Switch(usuario='lucas', senha='Lucas93@huawei', ip='10.0.99.1', protocolo='ssh', porta=22, fabricante='huawei')
+        if destino.protocolo == 'ssh':
+            connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
+            connect.logfile_read = logs
+            connect.expect(PROMPT)
+            connect.sendline(destino.senha)
+            connect.expect(PROMPT)
+            if destino.fabricante == 'huawei':
+                if isinstance(destino, Config._Config__OLT):
+                    connect.sendline("enable")
+                    connect.expect(PROMPT)
+                    connect.sendline("config")
+                    connect.expect(PROMPT)
+                    connect.sendline("\r")
+        else: # telnet
+            connect = pexpect.spawn(f'telnet {destino.ip} {destino.porta}')
+            connect.logfile_read = logs # linka processo "filho" do pexpect.spawn  ao arquivo log
+            connect.expect(PROMPT)
+            connect.sendline(destino.usuario)
+            connect.expect(PROMPT)
+            connect.sendline(destino.senha)
+            if destino.fabricante == 'huawei':
+                if isinstance(destino, Config._Config__OLT):
+                    connect.sendline("enable")
+                    connect.expect(PROMPT)
+                    connect.sendline("config")
+                    connect.expect(PROMPT)
+                    connect.sendline("\r")
+
+        connect.interact()
+        print('Desconectado do dispositivo. Caso deseje sair do menu principal, selecione "sair"')
+        logs.close()
 
 
-    subprocess.call(["python3", destino])
+
+    #subprocess.call(["python3", destino])
 
     # desenha o banner de novo, agora no loop infinito do menu principal
     print(Figlet("eftifont").renderText('MENU PRINCIPAL'))

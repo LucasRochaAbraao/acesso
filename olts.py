@@ -4,8 +4,8 @@
 import os
 import pathlib
 import pexpect
-import subprocess
 from datetime import datetime
+import subprocess
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from config import Config
 
