@@ -116,7 +116,7 @@ while True:
 
         ####### acesso ######
         PROMPT = ["#", ">", ":"]
-        # Switch(usuario='lucas', senha='Lucas93@huawei', ip='10.0.99.1', protocolo='ssh', porta=22, fabricante='huawei')
+        
         if destino.protocolo == 'ssh':
             connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
             connect.logfile_read = logs
