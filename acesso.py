@@ -116,7 +116,8 @@ while True:
 
         ####### acesso ######
         PROMPT = ["#", ">", ":"]
-        
+       
+        # ssh com senha
         if destino.protocolo == 'ssh':
             connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
             connect.logfile_read = logs
@@ -130,6 +131,14 @@ while True:
                     connect.sendline("config")
                     connect.expect(PROMPT)
                     connect.sendline("\r")
+        
+        # ssh com chave
+        elif destino.protocolo == 'chave':
+            connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
+            connect.logfile_read = logs
+            connect.expect(PROMPT)
+
+
         else: # telnet
             connect = pexpect.spawn(f'telnet {destino.ip} {destino.porta}')
             connect.logfile_read = logs # linka processo "filho" do pexpect.spawn  ao arquivo log
