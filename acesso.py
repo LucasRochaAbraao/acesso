@@ -68,7 +68,7 @@ if __name__ == '__main__':
         if categoria == 'sair':
             print('Volte sempre!')
             time.sleep(0.5)
-            #subprocess.Popen("clear")
+            subprocess.run('clear -x', shell=True)
             sys.exit()
 
         # retorna um namedtuple de todos dispositivos
@@ -78,7 +78,8 @@ if __name__ == '__main__':
         hostname_choices.append('voltar')
 
         subprocess.run('clear -x', shell=True)
-        while True:    
+        while True:
+            print(Figlet("eftifont").renderText(categoria.upper())) # Banner da categoria atual
             host_options = [
                 inquirer.List(
                     'hosts',
@@ -90,6 +91,7 @@ if __name__ == '__main__':
             host = inquirer.prompt(host_options, theme=TEMA)['hosts']
             subprocess.run('clear -x', shell=True)
             if host == 'voltar':
+                print(Figlet("eftifont").renderText("MENU PRINCIPAL")) # Banner menu principal
                 break
 
             destino = hosts.get(host) # extrai o namedtuple de um host do arquivo config.py
@@ -145,7 +147,8 @@ if __name__ == '__main__':
                         connect.sendline("\r")
 
             connect.interact()
-            print('Desconectado do dispositivo. Caso deseje sair do menu principal, selecione "sair"')
+            print('Desconectado do dispositivo. Caso deseje voltar ao menu principal, selecione "voltar".')
+            subprocess.run('clear -x', shell=True)
             logs.close()
 
 
