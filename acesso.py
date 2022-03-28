@@ -123,6 +123,10 @@ if __name__ == '__main__':
                 connect = pexpect.spawn(f'ssh -p {destino.porta} {destino.usuario}@{destino.ip}')
                 connect.logfile_read = logs
                 connect.expect(PROMPT)
+            
+            elif destino.protocolo == 'web':
+                subprocess.Popen(f"google-chrome-stable {destino.ip} &>/dev/null", shell=True)
+                break
 
 
             else: # telnet
