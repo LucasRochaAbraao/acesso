@@ -10,3 +10,5 @@ logs/SRVs/*
 __pycache__/
 .venv/
 .vscode
+acesso_curses.py
+npyscreen_acesso.py
