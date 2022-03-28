@@ -3,6 +3,12 @@ logs/CEs/*
 logs/OLTs/*
 logs/SWs/*
 logs/SRVs/*
+logs/OLT/*
+logs/SW/*
+logs/SRV/*
+!logs/OLT/.gitkeep
+!logs/SW/.gitkeep
+!logs/SRV/.gitkeep
 !logs/CEs/.gitkeep
 !logs/OLTs/.gitkeep
 !logs/SWs/.gitkeep
